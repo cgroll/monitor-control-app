@@ -29,8 +29,8 @@ app.post('/api/send-display-number', async (req, res) => {
     return res.status(400).json({ error: 'Message must be a number between 1 and 4.' });
   }
 
-  const displayUrl = `http://localhost:8080/display/${displayNumber}`;
-  console.log(`Received display number: ${displayNumber}. Forwarding to display service...`);
+  const displayUrl = `http://127.0.0.1:8080/display/${displayNumber}`;
+  console.log(`Received display number: ${displayNumber}. Forwarding to display service: ${displayUrl}`);
 
   try {
     // Forward the display number to the local display service
