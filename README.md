@@ -16,7 +16,7 @@ Follow these steps to get the application running on your local machine for deve
     cd your-repo-name
     ```
 2.  **Install dependencies:**
-    It's recommended to run `npm install` to ensure all necessary packages for both frontend and backend are installed.
+    It's recommended to run `npm install` at the parent level but also in both subdirectories `frontend` and `backend` to ensure all necessary packages for both frontend and backend are installed.
     ```bash
     npm install
     ```
