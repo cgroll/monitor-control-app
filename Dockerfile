@@ -1,41 +1,35 @@
-# Build stage
-FROM --platform=linux/arm64 node:20-alpine AS builder
+# Use an official Node.js runtime as the base image
+FROM node:20-alpine
 
+# Set the working directory in the container
 WORKDIR /app
 
-# Copy package files
-COPY package*.json ./
+# --- Dependency Installation ---
 
-# Install dependencies
-RUN npm ci
+# Copy the root, frontend, and backend package.json files
+# This leverages Docker's cache. If these files don't change,
+# the 'npm install' steps won't re-run on subsequent builds.
+COPY package.json ./
+COPY frontend/package.json ./frontend/
+COPY backend/package.json ./backend/
 
-# Copy source code
+# Install root dependencies (concurrently)
+RUN npm install
+
+# Install frontend and backend dependencies
+RUN npm install --prefix frontend
+RUN npm install --prefix backend
+
+# --- Application Code ---
+
+# Copy the rest of the application source code
 COPY . .
 
-# Build the application
-RUN npm run build
+# --- Run ---
 
-# ---------------------------------------------------
-# Production stage (Using Node.js to serve static files)
-# ---------------------------------------------------
-FROM --platform=linux/arm64 node:20-alpine AS production
-
-WORKDIR /app
-
-# Install nginx
-RUN apk add --no-cache nginx
-
-# Copy build files from builder stage
-COPY --from=builder /app/build /usr/share/nginx/html
-
-# Copy nginx configuration (if you have a custom config)
-# COPY nginx.conf /etc/nginx/nginx.conf
-
-# Set production environment
-ENV NODE_ENV=production
-
-# Expose port 3000 
+# The React development server runs on port 3000
 EXPOSE 3000
 
-# Start nginx
-CMD ["nginx", "-g", "daemon off;"]
+# The default command is 'npm start' from the root package.json,
+# which will launch 'concurrently'
+CMD ["npm", "start"]

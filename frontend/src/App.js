@@ -3,9 +3,6 @@ import { Grid, Button, Box, Typography } from '@mui/material';
 import { styled } from '@mui/material/styles';
 import axios from 'axios';
 
-const TELEGRAM_BOT_TOKEN = process.env.REACT_APP_TELEGRAM_BOT_TOKEN;
-const TELEGRAM_CHAT_ID = process.env.REACT_APP_TELEGRAM_CHAT_ID;
-
 // Colors from the target screenshot
 const colors = {
   background: 'rgb(97, 113, 119)',
@@ -53,23 +50,28 @@ const LayoutLabel = styled(Typography)({
 
 
 function App() {
-  const handleButtonClick = async (buttonText) => {
+  const getOperatingSystem = () => {
+    const userAgent = navigator.userAgent.toLowerCase();
+    if (userAgent.includes('win')) return 'Windows';
+    if (userAgent.includes('linux')) {
+      if (userAgent.includes('arm') || userAgent.includes('aarch64')) return 'Raspberry Pi';
+      return 'Linux';
+    }
+    return 'Unknown OS';
+  };
+
+  const handleButtonClick = async (buttonNumber) => {
     try {
-      const telegramBotToken = TELEGRAM_BOT_TOKEN;
-      const telegramChatId = TELEGRAM_CHAT_ID;
-      const message = `Button "${buttonText}" was pressed!`;
+      const os = getOperatingSystem();
+      const message = `Button "${buttonNumber}" was pressed on ${os}`;
+      console.log(message);
 
-      await axios.post(
-        `https://api.telegram.org/bot${telegramBotToken}/sendMessage`,
-        {
-          chat_id: telegramChatId,
-          text: message,
-        }
-      );
+      const backendUrl = '/api/send-display-number';
+      await axios.post(backendUrl, { message: buttonNumber.toString() });
 
-      console.log('Telegram message sent successfully!');
+      console.log('Request sent to backend successfully!');
     } catch (error) {
-      console.error('Error sending Telegram message:', error);
+      console.error('Error calling the backend API:', error);
     }
   };
 
@@ -101,7 +103,7 @@ function App() {
         {/* --- Layout A --- */}
         <Grid item xs={6} sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
           <StyledButton
-            onClick={() => handleButtonClick('Layout A')}
+            onClick={() => handleButtonClick(1)}
             disableRipple
           >
             <ButtonImage
@@ -117,7 +119,7 @@ function App() {
         {/* --- Layout B --- */}
         <Grid item xs={6} sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
           <StyledButton
-            onClick={() => handleButtonClick('Layout B')}
+            onClick={() => handleButtonClick(2)}
             disableRipple
           >
             <ButtonImage
@@ -133,7 +135,7 @@ function App() {
         {/* --- Layout C --- */}
         <Grid item xs={6} sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
           <StyledButton
-            onClick={() => handleButtonClick('Layout C')}
+            onClick={() => handleButtonClick(3)}
             disableRipple
           >
             <ButtonImage
@@ -149,7 +151,7 @@ function App() {
         {/* --- Layout D --- */}
         <Grid item xs={6} sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
           <StyledButton
-            onClick={() => handleButtonClick('Layout D')}
+            onClick={() => handleButtonClick(4)}
             disableRipple
           >
             <ButtonImage
